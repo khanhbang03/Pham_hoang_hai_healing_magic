@@ -1,0 +1,442 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Pham hoàng hai — Healing Magic</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    :root{
+      --bg:#0f1724;
+      --card:#0b1220;
+      --accent:#7ef9a6;
+      --accent-2:#7ad0ff;
+      --muted:#94a3b8;
+      --soft:#111827;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;
+      background:
+        radial-gradient(800px 400px at 10% 10%, rgba(122,208,255,0.05), transparent 10%),
+        radial-gradient(600px 300px at 90% 90%, rgba(126,249,166,0.03), transparent 10%),
+        var(--bg);
+      color:#e6eef8;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+      gap:20px;
+    }
+
+    .card{
+      width:900px;
+      max-width:100%;
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border:1px solid rgba(255,255,255,0.04);
+      border-radius:16px;
+      padding:20px;
+      display:grid;
+      grid-template-columns: 420px 1fr;
+      gap:20px;
+      align-items:center;
+      box-shadow: 0 10px 40px rgba(2,6,23,0.6), inset 0 1px 0 rgba(255,255,255,0.02);
+    }
+
+    header h1{
+      margin:0 0 6px 0;
+      font-size:20px;
+    }
+    header p{margin:0;color:var(--muted);font-size:13px}
+
+    .scene{
+      background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));
+      border-radius:12px;
+      padding:18px;
+      position:relative;
+      overflow:hidden;
+      min-height:420px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    /* character card */
+    .char-wrap{
+      width:320px;
+      height:360px;
+      position:relative;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    /* Simple stylized body using SVG below. We'll place glowing particles around the butt area. */
+    svg{width:320px;height:360px;display:block}
+
+    /* particle styles */
+    .particle{
+      position:absolute;
+      width:8px;height:8px;border-radius:50%;
+      background:var(--accent);
+      box-shadow:0 0 8px rgba(126,249,166,0.9), 0 0 18px rgba(122,208,255,0.6);
+      pointer-events:none;
+      transform:translate(-50%,-50%) scale(0);
+      opacity:0;
+      will-change:transform,opacity,filter;
+    }
+
+    /* controls */
+    .controls{
+      padding:6px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+    .controls .row{display:flex;gap:8px;align-items:center}
+    label{font-size:13px;color:var(--muted);min-width:120px}
+    input[type=range]{flex:1}
+    button{
+      background:linear-gradient(90deg,var(--accent),var(--accent-2));
+      border:none;color:#042a1f;padding:10px 14px;border-radius:10px;font-weight:600;
+      cursor:pointer;box-shadow:0 8px 20px rgba(122,208,255,0.08);
+    }
+    button.secondary{
+      background:transparent;color:var(--accent-2);border:1px solid rgba(122,208,255,0.12);
+      box-shadow:none;font-weight:600;
+    }
+
+    .status{
+      background:rgba(255,255,255,0.02);
+      padding:12px;border-radius:10px;font-size:13px;color:var(--muted);
+    }
+
+    .butt-highlight{
+      position:absolute;
+      width:120px;height:80px;
+      left:50%; top:56%;
+      transform:translate(-50%,-50%);
+      border-radius:52% 48% 60% 40% / 48% 52% 48% 52%;
+      pointer-events:none;
+      mix-blend-mode:screen;
+      filter:blur(8px);
+      opacity:0;
+      transition:opacity .25s ease;
+      box-shadow:0 0 40px 18px rgba(126,249,166,0.12), 0 0 18px 6px rgba(122,208,255,0.06);
+    }
+
+    .butt-glow{
+      position:absolute; inset:0;
+      background:radial-gradient(circle at 40% 40%, rgba(126,249,166,0.35), rgba(122,208,255,0.12) 40%, transparent 65%);
+      border-radius:inherit;
+      transform:scale(.9);
+      transition:transform .25s ease;
+    }
+
+    .meter{
+      height:10px;background:rgba(255,255,255,0.04);border-radius:6px;overflow:hidden;
+    }
+    .meter > i{display:block;height:100%;width:0%;background:linear-gradient(90deg,var(--accent),var(--accent-2));border-radius:6px;transition:width 300ms linear}
+
+    footer{grid-column:1/-1;margin-top:6px;text-align:center;color:var(--muted);font-size:12px}
+
+    /* small responsive tweak */
+    @media (max-width:880px){
+      .card{grid-template-columns:1fr; padding:16px}
+      .char-wrap{margin:0 auto}
+      header{display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+    }
+  </style>
+</head>
+<body>
+  <div class="card" role="main" aria-labelledby="title">
+    <div>
+      <header>
+        <h1 id="title">Pham hoàng hai — Healing Magic Clinic (After the Fight)</h1>
+        <p>Interactive playful page: watch Pham hoàng hai use gentle healing magic to soothe his battle-sore butt.</p>
+      </header>
+
+      <div class="scene" aria-hidden="false">
+        <div class="char-wrap" id="stage">
+          <!-- SVG character: simple, friendly, non-explicit -->
+           <img src="pham hoang hai i healing hi butt.png" alt="Pham hoàng hai character" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:320px;height:360px;pointer-events:none;z-index:2;opacity:0.5"/>
+           <img src="Screenshot 2025-10-21 114525.png" alt="Healing magic aura effect" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:360px;height:400px;pointer-events:none;z-index:2;opacity:0.5"/>
+           <img src="Screenshot 2025-10-21 114917.png" alt="Healing magic aura effect" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:360px;height:400px;pointer-events:none;z-index:2;opacity:0.5"/>
+          <svg viewBox="0 0 200 220" role="img" aria-label="Cartoon person using magic">
+            <defs>
+              <linearGradient id="skin" x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0" stop-color="#ffd7b5"/>
+                <stop offset="1" stop-color="#ffcaa2"/>
+              </linearGradient>
+              <filter id="soft-shadow" x="-50%" y="-50%" width="200%" height="200%">
+                <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#000" flood-opacity="0.25"/>
+              </filter>
+            </defs>
+
+            <!-- ground -->
+            <ellipse cx="100" cy="200" rx="80" ry="12" fill="rgba(2,6,23,0.6)"></ellipse>
+
+            <!-- body -->
+            <g transform="translate(0,10)">
+              <!-- torso -->
+              <rect x="60" y="70" width="80" height="70" rx="14" fill="#334155" />
+              <!-- head -->
+              <circle cx="100" cy="42" r="22" fill="url(#skin)"/>
+              <!-- hair -->
+              <path d="M82 35 q18 -18 36 0 q-6 -10 -30 -8 q-6 2 -6 8z" fill="#1f2937"/>
+              <!-- arms -->
+              <path d="M60 96 q-16 8 -24 24 q6 6 10 6 q18 -14 32 -18z" fill="#334155" />
+              <path d="M140 96 q16 8 24 24 q-6 6 -10 6 q-18 -14 -32 -18z" fill="#334155" />
+              <!-- legs -->
+              <rect x="74" y="140" width="16" height="48" rx="6" fill="#0f1724"/>
+              <rect x="110" y="140" width="16" height="48" rx="6" fill="#0f1724"/>
+              <!-- butt area (stylized) -->
+              <g id="butt" transform="translate(100,118)">
+                <ellipse cx="0" cy="12" rx="36" ry="22" fill="#7b2e2e" opacity="0.12"></ellipse>
+                <ellipse cx="-10" cy="12" rx="18" ry="14" fill="#0f1724" opacity="0.08"></ellipse>
+                <ellipse cx="10" cy="12" rx="18" ry="14" fill="#0f1724" opacity="0.08"></ellipse>
+              </g>
+
+              <!-- magic staff / gesture -->
+              <g transform="translate(128,70) rotate(-10)">
+                <rect x="0" y="0" width="6" height="46" rx="3" fill="#b4c8ff" opacity="0.9"></rect>
+                <circle cx="3" cy="-6" r="8" fill="#7ef9a6"/>
+                <circle cx="3" cy="-6" r="4" fill="#fff" opacity="0.8"></circle>
+              </g>
+
+              <!-- little face -->
+              <circle cx="92" cy="40" r="2" fill="#111827"/>
+              <circle cx="108" cy="40" r="2" fill="#111827"/>
+              <path d="M92 48 q8 6 16 0" stroke="#111827" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+            </g>
+          </svg>
+
+          <div class="butt-highlight" id="buttGlow" aria-hidden="true">
+            <div class="butt-glow"></div>
+          </div>
+
+          <!-- particle container -->
+          <div id="particles" aria-hidden="true"></div>
+        </div>
+      </div>
+    </div>
+
+    <aside class="controls" aria-label="Healing controls">
+      <div>
+        <div class="row">
+          <label for="intensity">Magic intensity</label>
+          <input id="intensity" type="range" min="1" max="10" value="6" />
+        </div>
+        <div class="row">
+          <label for="duration">Duration (secs)</label>
+          <input id="duration" type="range" min="3" max="30" value="8" />
+        </div>
+      </div>
+
+      <div class="row">
+        <button id="healBtn" aria-pressed="false">Start Healing</button>
+        <button id="zapBtn" class="secondary">Quick Zap</button>
+      </div>
+
+      <div class="status">
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+          <div style="width:110px">Healing progress</div>
+          <div style="flex:1" class="meter" aria-hidden="true"><i id="meterFill"></i></div>
+        </div>
+        <div id="statusText">Ready. <span style="color:var(--muted)">Click "Start Healing".</span></div>
+      </div>
+
+      <div style="font-size:12px;color:var(--muted);margin-top:8px">
+        Tip: drag "Magic intensity" higher for more sparkles. "Quick Zap" is a short pulse.
+      </div>
+    </aside>
+
+    <footer>
+      Made for fun — non-medical. Character: Pham hoàng hai (fictional playful scene).
+    </footer>
+  </div>
+
+<script>
+(function(){
+  const healBtn = document.getElementById('healBtn');
+  const zapBtn = document.getElementById('zapBtn');
+  const intensityInput = document.getElementById('intensity');
+  const durationInput = document.getElementById('duration');
+  const particlesEl = document.getElementById('particles');
+  const buttGlow = document.getElementById('buttGlow');
+  const meterFill = document.getElementById('meterFill');
+  const statusText = document.getElementById('statusText');
+
+  let healing = false;
+  let audioCtx = null;
+
+  function createParticle(x,y,dx,dy,color,life,scale){
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.left = x + 'px';
+    p.style.top = y + 'px';
+    p.style.background = color || 'radial-gradient(circle, #7ef9a6, #7ad0ff)';
+    particlesEl.appendChild(p);
+
+    requestAnimationFrame(()=>{
+      p.style.opacity = 1;
+      p.style.transform = `translate(-50%,-50%) scale(${scale})`;
+      const frames = Math.max(12, Math.floor(life/16));
+      let frame=0;
+      const id = setInterval(()=>{
+        frame++;
+        const nx = x + dx * (frame/frames);
+        const ny = y + dy * (frame/frames) - (0.3*frame); // float up
+        p.style.left = nx + 'px';
+        p.style.top = ny + 'px';
+        p.style.filter = 'blur(' + (Math.min(6, frame/frames*6)) + 'px)';
+        p.style.opacity = String(Math.max(0, 1 - frame/frames));
+        if(frame>=frames){
+          clearInterval(id);
+          p.remove();
+        }
+      }, 16);
+    });
+  }
+
+  function playHealingSound(frequency, duration, type='sine'){
+    try{
+      if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const o = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      o.type = type;
+      o.frequency.value = frequency;
+      g.gain.value = 0.001;
+      o.connect(g);
+      g.connect(audioCtx.destination);
+      o.start();
+      g.gain.linearRampToValueAtTime(0.12, audioCtx.currentTime + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration/1000);
+      o.stop(audioCtx.currentTime + duration/1000 + 0.02);
+    }catch(e){
+      // audio not allowed or unavailable
+    }
+  }
+
+  function getStageRect(){
+    const rect = document.getElementById('stage').getBoundingClientRect();
+    return rect;
+  }
+
+  function emitParticlesBurst(count, intensity){
+    const rect = getStageRect();
+    // center around butt position
+    const cx = rect.left + rect.width * 0.5;
+    const cy = rect.top + rect.height * 0.56;
+    for(let i=0;i<count;i++){
+      const angle = (Math.random()*Math.PI) - (Math.PI/2);
+      const speed = (Math.random()*18 + 6) * (intensity/6);
+      const dx = Math.cos(angle) * speed;
+      const dy = Math.sin(angle) * speed * 0.6;
+      const x = cx + (Math.random()*40-20);
+      const y = cy + (Math.random()*20-10);
+      const color = Math.random()>0.4 ? 'var(--accent)' : 'var(--accent-2)';
+      createParticle(x - rect.left, y - rect.top, dx, -Math.abs(dy), color, 600+Math.random()*1000, 0.6+Math.random()*0.8);
+    }
+  }
+
+  function startHealing(durationSecs, intensity){
+    if(healing) return;
+    healing = true;
+    healBtn.setAttribute('aria-pressed','true');
+    healBtn.textContent = 'Healing…';
+    statusText.textContent = 'Healing in progress — soothing battle bruises...';
+    buttGlow.style.opacity = 1;
+    buttGlow.style.transform = 'translate(-50%,-50%) scale(1.03)';
+
+    const totalMs = durationSecs*1000;
+    const start = performance.now();
+
+    const freqBase = 380 + intensity*12;
+    const tick = () => {
+      const now = performance.now();
+      const elapsed = now - start;
+      const pct = Math.min(1, elapsed/totalMs);
+      meterFill.style.width = (pct*100).toFixed(1) + '%';
+      // emit particles periodically
+      if(Math.random() < 0.8){
+        emitParticlesBurst(2 + Math.floor(intensity/2), intensity);
+      }
+      // play small tones occasionally
+      if(Math.random() < 0.12){
+        playHealingSound(freqBase + Math.random()*120, 150 + Math.random()*260, Math.random()>0.5?'sine':'triangle');
+      }
+      if(pct < 1){
+        requestAnimationFrame(tick);
+      } else {
+        finishHealing();
+      }
+    };
+    requestAnimationFrame(tick);
+  }
+
+  function finishHealing(){
+    healing = false;
+    healBtn.setAttribute('aria-pressed','false');
+    healBtn.textContent = 'Start Healing';
+    statusText.textContent = 'All better — Pham hoàng hai is feeling soothed! (This is playful fiction.)';
+    buttGlow.style.opacity = 0;
+    meterFill.style.width = '100%';
+    // happy particle finale
+    emitParticlesBurst(28, Number(intensityInput.value));
+    playHealingSound(720, 450, 'sine');
+    setTimeout(()=>{ meterFill.style.width = '0%'; }, 1200);
+  }
+
+  healBtn.addEventListener('click', ()=>{
+    const dur = Number(durationInput.value);
+    const intensity = Number(intensityInput.value);
+    startHealing(dur, intensity);
+  });
+
+  zapBtn.addEventListener('click', ()=>{
+    // quick short zap
+    if(healing) return;
+    statusText.textContent = 'Quick zap! A little magic pulse.';
+    buttGlow.style.opacity = 1;
+    buttGlow.style.transform = 'translate(-50%,-50%) scale(1.06)';
+    emitParticlesBurst(12, Number(intensityInput.value));
+    playHealingSound(520, 200, 'square');
+    setTimeout(()=>{ buttGlow.style.opacity = 0; buttGlow.style.transform='translate(-50%,-50%) scale(0.98)'; statusText.textContent='Ready.' }, 700);
+  });
+
+  // accessibility: keyboard activation
+  healBtn.addEventListener('keyup', (e)=>{ if(e.key === 'Enter' || e.key === ' ') healBtn.click(); });
+  zapBtn.addEventListener('keyup', (e)=>{ if(e.key === 'Enter' || e.key === ' ') zapBtn.click(); });
+
+  // responsive particle container sizing (positioned relative to stage)
+  function updateParticlesPosition(){
+    const stage = document.getElementById('stage');
+    const rect = stage.getBoundingClientRect();
+    particlesEl.style.width = rect.width + 'px';
+    particlesEl.style.height = rect.height + 'px';
+    particlesEl.style.position = 'absolute';
+    particlesEl.style.left = 0;
+    particlesEl.style.top = 0;
+    particlesEl.style.pointerEvents = 'none';
+  }
+  // attach particles container inside stage for absolute coords
+  const stageEl = document.getElementById('stage');
+  stageEl.style.position = 'relative';
+  stageEl.appendChild(particlesEl);
+  updateParticlesPosition();
+  window.addEventListener('resize', updateParticlesPosition);
+
+  // initial small idle particles to make scene lively
+  (function idleParticles(){
+    setInterval(()=>{
+      if(Math.random() < 0.6) emitParticlesBurst(1 + Math.floor(Math.random()*2), 3 + Math.random()*4);
+    }, 900);
+  })();
+
+})();
+</script>
+</body>
+</html>
